@@ -1,0 +1,105 @@
+{% load case_study_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="refresh" content="60" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HackerNews API</title>
+  </head>
+  <style>
+    p a {
+      display: inline-block;
+      border: 1px solid;
+      padding: 2px;
+      min-width: 30px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    div a {
+      color: blue;
+    }
+    p a:link,
+    p a:visited,
+    p a:hover,
+    p a:active {
+      text-decoration: none;
+      color: inherit;
+    }
+    #active {
+      background-color: blue;
+      color: white;
+    }
+    button a {
+      color: black;
+      text-decoration: none;
+    }
+  </style>
+  <body>
+    <!-- Start of Header -->
+    <div style="text-align: center">
+      These are the lastest items on HackerNews
+      <br />
+      <br />
+      Filter by
+      <a href="?type=comment">Comment</a> || <a href="?type=story">Story</a> ||
+      <a href="?type=all">Clear Filter</a>
+      <br />
+      <br />
+      Search text for
+      <form action="">
+        <input type="text" name="search" id="" />
+        <button>Search</button>
+      </form>
+      <br />
+      <a href="{% url 'case_study:get_news' %}"><button>HOME</button> </a>
+    </div>
+    <!-- End of Header -->
+
+    <!-- Start of List -->
+    {% for i in news %}
+    <p>
+      {{i.id}} by {{i.by}} -----> type {{i.type}} . || {{i.time}}
+      <br />{{i.text}}
+    </p>
+    <br />
+    {% endfor %}
+    <!-- End of List -->
+
+    <!-- Pagination -->
+    <p style="text-align: center">
+      {% if news.has_previous %}
+      <a href="?{% url_replace request 'page' news.previous_page_number %}"
+        >«</a
+      >
+      {% if news.number > 3 %}
+      <a href="?page=1">1</a>
+      {% if news.number > 4 %}
+      <span>...</span>
+      {% endif %} {% endif %} {% endif %}
+      <!-- to prevent breaking-->
+      {% for num in news.paginator.page_range %} {% if news.number == num %}
+      <a href="?{% url_replace request 'page' num %}" id="active">{{ num }}</a>
+      {% elif num > news.number|add:'-3' and num < news.number|add:'3' %}
+      <a href="?{% url_replace request 'page' num %}">{{ num }}</a>
+      {% endif %} {% endfor %} {% if news.has_next %}
+      <!-- to prevent breaking -->
+      {% if news.number < news.paginator.num_pages|add:'-3' %}
+      <span>...</span>
+      <a href="?{% url_replace request 'page' news.paginator.num_pages %}"
+        >{{ news.paginator.num_pages }}</a
+      >
+      {% elif news.number < news.paginator.num_pages|add:'-2' %}
+      <a href="?{% url_replace request 'page' news.paginator.num_pages %}"
+        >{{ news.paginator.num_pages }}</a
+      >
+
+      {%endif%}
+      <a href="?{% url_replace request 'page' news.next_page_number %}"> »</a>
+      {%endif%}
+    </p>
+    <!-- End of Pagination -->
+  </body>
+</html>
